@@ -6,6 +6,7 @@
     <title>Khalid Durrani - Web Developer</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -458,7 +459,7 @@
             <div class="fade-in">
                 <h2 class="text-4xl font-bold text-center mb-16 gradient-text">Get In Touch</h2>
                 <div class="contact-form rounded-2xl p-8">
-                    <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-6">
+                    <form id="contactForm" class="space-y-6">
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="name" class="block text-sm font-medium mb-2">Full Name</label>
@@ -569,22 +570,61 @@
             });
         });
 
-        // Form submission feedback
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function(e) {
-            const button = form.querySelector('button[type="submit"]');
+        // Initialize EmailJS
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY"); // You'll need to replace this with your actual EmailJS public key
+        })();
+
+        // Form submission with EmailJS
+        const contactForm = document.getElementById('contactForm');
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const button = contactForm.querySelector('button[type="submit"]');
             const originalText = button.innerHTML;
             button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
             button.disabled = true;
             
-            // Reset button after 3 seconds (for demo purposes)
-            setTimeout(() => {
-                button.innerHTML = '<i class="fas fa-check mr-2"></i>Message Sent!';
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }, 2000);
-            }, 1000);
+            // Get form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                message: document.getElementById('message').value,
+                to_email: 'sudo.durranii@gmail.com' // Your Gmail address
+            };
+            
+            // Send email using EmailJS
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    button.innerHTML = '<i class="fas fa-check mr-2"></i>Message Sent!';
+                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    button.classList.add('bg-green-600', 'hover:bg-green-700');
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    }, 3000);
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    button.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Failed to Send';
+                    button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    button.classList.add('bg-red-600', 'hover:bg-red-700');
+                    
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                        button.classList.remove('bg-red-600', 'hover:bg-red-700');
+                        button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    }, 3000);
+                });
         });
 
         // Typing animation for hero section
