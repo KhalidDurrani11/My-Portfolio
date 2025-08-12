@@ -606,7 +606,14 @@
             
             // Create mailto link with form data
             const subject = `Portfolio Contact from ${name}`;
-            const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMessage:%0D%0A${message}%0D%0A%0D%0A---%0D%0AThis message was sent from your portfolio contact form.`;
+            const body = `Name: ${name}
+Email: ${email}
+
+Message:
+${message}
+
+---
+This message was sent from your portfolio contact form.`;
             
             const mailtoLink = `mailto:sudo.durranii@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             
